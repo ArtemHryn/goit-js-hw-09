@@ -42,7 +42,8 @@ class Timer {
       const currentTime = Date.now();
       const deltaTime = this.targetTime - currentTime;
       if (deltaTime < 1000) {
-        clearInterval(this.intervalID);
+          clearInterval(this.intervalID);
+          this.isActive = false
         this.enableChoose(this.isActive);
       }
       this.setTime(deltaTime);
