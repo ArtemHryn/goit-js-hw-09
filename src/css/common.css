@@ -31,3 +31,17 @@ img {
 .button[disabled]:hover{
   background-color: rgba(255, 0, 0, 0.2);
 }
+
+.timer{
+  display: flex;
+}
+
+.field{
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+}
+
+.value{
+  font-size: 36px;
+}
