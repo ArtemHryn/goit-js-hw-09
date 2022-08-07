@@ -1,7 +1,7 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-
-let selectedDate = null;
+import 'notiflix/dist/notiflix-3.2.5.min.css';
+import Notiflix from 'notiflix';
 
 const options = {
   enableTime: true,
@@ -10,6 +10,13 @@ const options = {
   minuteIncrement: 1,
   onClose(selectedDates) {
     timer.targetTime = selectedDates[0].getTime();
+    if (timer.targetTime < Date.now()) {
+      Notiflix.Notify.failure('Please choose a date in the future', {
+        timeout: 2000,
+      });
+      return;
+    }
+    refs.startBtn.disabled = false;
   },
 };
 
@@ -17,6 +24,7 @@ flatpickr('#datetime-picker', options);
 
 const refs = {
   startBtn: document.querySelector('[data-start]'),
+  resetBtn: document.querySelector('[data-reset]'),
   calendar: document.querySelector('#datetime-picker'),
   days: document.querySelector('[data-days]'),
   hours: document.querySelector('[data-hours]'),
@@ -32,22 +40,27 @@ class Timer {
     this.updateUIOnTick = updateTimer;
   }
 
-    onStart() {
-        if (this.targetTime < Date.now()) {
-          window.alert('Please choose a date in the future');
-      }
+  onStart() {
     this.isActive = true;
     this.enableChoose(this.isActive);
     this.intervalID = setInterval(() => {
       const currentTime = Date.now();
       const deltaTime = this.targetTime - currentTime;
       if (deltaTime < 1000) {
-          clearInterval(this.intervalID);
-          this.isActive = false
+        clearInterval(this.intervalID);
+        this.isActive = false;
         this.enableChoose(this.isActive);
       }
       this.setTime(deltaTime);
     }, 1000);
+    Notiflix.Notify.success('The timer has been started', { timeout: 2000 });
+  }
+
+  onReset() {
+    clearInterval(this.intervalID);
+    refs.calendar.disabled = false;
+    this.setTime(0);
+    Notiflix.Notify.info('The timer has been reset');
   }
   convertMs(ms) {
     const second = 1000;
@@ -70,6 +83,7 @@ class Timer {
     const convertedTime = this.convertMs(time);
     this.updateUIOnTick(convertedTime);
   }
+
   addLeadingZero(value) {
     return String(value).padStart(2, '0');
   }
@@ -82,6 +96,7 @@ class Timer {
 const timer = new Timer({ updateTimer });
 
 refs.startBtn.addEventListener('click', timer.onStart.bind(timer));
+refs.resetBtn.addEventListener('click', timer.onReset.bind(timer));
 
 function updateTimer({ days, hours, minutes, seconds }) {
   refs.days.textContent = days;
