@@ -28,7 +28,7 @@ function createPromise(position, delay) {
 
 function listOfDelay(delay, step, amount) {
   let stepDelay = delay;
-  for (i = 1; i <= amount; i += 1) {
+  for (let i = 1; i <= amount; i += 1) {
     createPromise(i, stepDelay)
       .then(({ position, delay }) =>
         Notiflix.Notify.success(
